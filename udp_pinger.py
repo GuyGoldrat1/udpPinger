@@ -2,19 +2,19 @@ import socket
 import sys
 import time
 
-def main():
-    if len(sys.argv) != 7 or sys.argv[1] != '-p' or sys.argv[3] != '-s' or sys.argv[5] != '-c':
-        print("Usage: python udp_pinger.py <ip_address> -p <port> -s <timeout_seconds> -c <count>")
-        sys.exit(1)
-
+def pinger():
+    # Parse command line arguments
     ip_address = sys.argv[1]
-    port = int(sys.argv[4])
-    timeout_seconds = int(sys.argv[6])
-    count = int(sys.argv[8])
+
+    # Set default values if optional arguments are not provided
+    port = int(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[3] == '-p' else 1337
+    size = int(sys.argv[6]) if len(sys.argv) > 6 and sys.argv[5] == '-s' else 100
+    count = int(sys.argv[8]) if len(sys.argv) > 8 and sys.argv[7] == '-c' else 10
+    timeout = int(sys.argv[10]) if len(sys.argv) > 10 and sys.argv[9] == '-t' else 1000
 
     # Create a UDP socket
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.settimeout(timeout_seconds)
+        sock.settimeout(timeout)
         sequence_number = 0
 
         for i in range(count):
@@ -41,7 +41,7 @@ def main():
 
             sequence_number += 1
 
-        print(f"--- {ip_address} statistics --- {count} packets transmitted, {sequence_number} packets received, "
+        print(f"---{ip_address} statistics--- \n{count} packets transmitted, {sequence_number} packets received, "
               f"{((sequence_number - count) / sequence_number) * 100:.1f}% packet loss")
 
 def create_ping_request(message_id):
@@ -57,4 +57,4 @@ def parse_message(data):
     return opcode, reply_id, payload
 
 if __name__ == "__main__":
-    main()
+    pinger()

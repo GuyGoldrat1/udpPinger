@@ -3,12 +3,9 @@ import sys
 
 def agent(host, port):
 
-
-    server_address = ('', port)
-
     # Create a UDP socket
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.bind(host, port)
+        sock.bind((host, port))
 
         print(f"UDP Agent listening on port {port}...")
 
@@ -33,7 +30,7 @@ def create_ping_reply(message_id, payload):
     return reply_data
 
 if __name__ == "__main__":
+
     PORT = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
     HOST = 'localhost'
-
-    agent()
+    agent(HOST, PORT)
