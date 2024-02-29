@@ -23,7 +23,7 @@ def parse_message(data):
     return opcode, message_id, payload
 
 def create_ping_reply(message_id, payload):
-    opcode = 1 << 7
+    opcode = 1
     reply_data = bytes([opcode]) + message_id.to_bytes(4, byteorder='big') + payload.encode()
     return reply_data
 

@@ -45,7 +45,7 @@ def create_ping_request(message_id, size):
     return ping_request
 
 def parse_message(data):
-    opcode = data[0] >> 7
+    opcode = data[0]
     reply_id = int.from_bytes(data[1:5], byteorder='big')
     payload = data[5:].decode('utf-8')
     return opcode, reply_id, payload
