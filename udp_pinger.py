@@ -2,19 +2,11 @@ import socket
 import sys
 import time
 
-def pinger():
-    # Parse command line arguments
-    ip_address = sys.argv[1]
-
-    # Set default values if optional arguments are not provided
-    port = int(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[3] == '-p' else 1337
-    size = int(sys.argv[6]) if len(sys.argv) > 6 and sys.argv[5] == '-s' else 100
-    count = int(sys.argv[8]) if len(sys.argv) > 8 and sys.argv[7] == '-c' else 10
-    timeout = int(sys.argv[10]) if len(sys.argv) > 10 and sys.argv[9] == '-t' else 1
+def pinger(ip,port,size,count,timeout):
 
     # Create a UDP socket
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.settimeout(timeout)
+        sock.settimeout(timeout/1000)
         sequence_number = 0
         resived = 0
 
@@ -24,8 +16,7 @@ def pinger():
 
             # Create ping request
             ping_request = create_ping_request(message_id, size)
-            print(ping_request)
-            sock.sendto(ping_request, (ip_address, port))
+            sock.sendto(ping_request, (ip, port))
 
             try:
                 data, address = sock.recvfrom(1024)
@@ -35,7 +26,7 @@ def pinger():
                 if opcode == 1 and reply_id == message_id:
                     rtt = round((recv_time - send_time) * 1000, 3)
                     resived+=1
-                    print(f"{sys.getsizeof(data) + sys.getsizeof(address)} bytes from {ip_address}: seq={sequence_number} rtt={rtt} ms")
+                    print(f"{len(data)} bytes from {ip}: seq={sequence_number} rtt={rtt} ms")
                 else:
                     print(f"Received invalid reply for sequence {sequence_number}")
 
@@ -44,13 +35,13 @@ def pinger():
 
             sequence_number += 1
 
-        print(f"---{ip_address} statistics--- \n{sequence_number} packets transmitted, {resived} packets received, "
+        print(f"---{ip} statistics--- \n{sequence_number} packets transmitted, {resived} packets received, "
               f"{((sequence_number - resived) / sequence_number) * 100:.1f}% packet loss")
 
 def create_ping_request(message_id, size):
     opcode = 0
-    payload = "A" * size
-    ping_request = bytes([opcode]) + message_id.to_bytes(4, byteorder='big') + payload.encode('utf-8')
+    payload = "a" * size
+    ping_request = bytes([opcode]) + message_id.to_bytes(4, byteorder='big') + payload.encode()
     return ping_request
 
 def parse_message(data):
@@ -60,4 +51,23 @@ def parse_message(data):
     return opcode, reply_id, payload
 
 if __name__ == "__main__":
-    pinger()
+    ip = sys.argv[1]
+    port=1337
+    size=100
+    count=10
+    timeout=1000
+    i=2
+    while(i<len(sys.argv)):
+        if sys.argv[i] == "-p":
+            port=int(sys.argv[i+1])
+        if sys.argv[i] == "-s":
+            size=int(sys.argv[i+1])
+        if sys.argv[i] == "-c":
+            count=int(sys.argv[i+1])
+        if sys.argv[i] == "-t":
+            timeout=int(sys.argv[i+1])
+        i+=1
+
+    
+
+    pinger(ip,port,size,count,timeout)

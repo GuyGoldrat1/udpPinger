@@ -7,8 +7,6 @@ def agent(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.bind((host, port))
 
-        print(f"UDP Agent listening on port {port}...")
-
         while True:
             data, address = sock.recvfrom(1024)
             opcode, message_id, payload = parse_message(data)
@@ -21,12 +19,12 @@ def agent(host, port):
 def parse_message(data):
     opcode = data[0] >> 7
     message_id = int.from_bytes(data[1:5], byteorder='big')
-    payload = data[5:].decode('utf-8')
+    payload = data[5:].decode()
     return opcode, message_id, payload
 
 def create_ping_reply(message_id, payload):
     opcode = 1 << 7
-    reply_data = bytes([opcode]) + message_id.to_bytes(4, byteorder='big') + payload.encode('utf-8')
+    reply_data = bytes([opcode]) + message_id.to_bytes(4, byteorder='big') + payload.encode()
     return reply_data
 
 if __name__ == "__main__":
