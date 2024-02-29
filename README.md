@@ -35,6 +35,7 @@ To run the UDP Pinger and Agent, follow the steps below:
 ```bash
 python udp_agent.py -p 1337
 python udp_pinger.py 127.0.0.1 -p 1337 -s 60 -c 4 -t 500
+```
 
 ## Program Functionality
 
